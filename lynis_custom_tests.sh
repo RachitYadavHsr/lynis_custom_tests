@@ -1,27 +1,3 @@
-#!/bin/sh
-
-#################################################################################
-#
-# Lynis custom tests
-#   Enhancement option 1: Password Policy Audit   (CUST-1010 to CUST-1040)
-#   Enhancement option 2: SSH Security Config Audit (CUST-2010 to CUST-2050)
-#
-# How to use:
-#   Copy this file into the Lynis 'include' directory and name it tests_custom
-#   Find your include directory with:  lynis show includedir
-#   Then run a normal audit:           sudo lynis audit system --quick
-#
-# Lynis runs custom tests with its own shell, so this file is plain sh (not bash).
-#
-#################################################################################
-
-
-#################################################################################
-#
-# ENHANCEMENT OPTION 1: PASSWORD POLICY AUDIT
-#
-#################################################################################
-
     InsertSection "Custom tests - Password policy audit"
 
     LOGIN_DEFS="${ROOTDIR}etc/login.defs"
@@ -29,8 +5,7 @@
 
     if [ -f "${LOGIN_DEFS}" ]; then PREQS_MET="YES"; SKIPREASON=""; else PREQS_MET="NO"; SKIPREASON="login.defs file not found"; fi
 
-    # Test        : CUST-1010
-    # Description : Maximum password age should be 90 days or less
+  
     Register --test-no CUST-1010 --preqs-met ${PREQS_MET} --skip-reason "${SKIPREASON}" --weight L --network NO --category security --description "Checking maximum password age (PASS_MAX_DAYS)"
     if [ ${SKIPTEST} -eq 0 ]; then
         LogText "Test: reading PASS_MAX_DAYS from ${LOGIN_DEFS}"
@@ -45,8 +20,6 @@
         fi
     fi
 
-    # Test        : CUST-1020
-    # Description : Minimum password age should be configured
     Register --test-no CUST-1020 --preqs-met ${PREQS_MET} --skip-reason "${SKIPREASON}" --weight L --network NO --category security --description "Checking minimum password age (PASS_MIN_DAYS)"
     if [ ${SKIPTEST} -eq 0 ]; then
         LogText "Test: reading PASS_MIN_DAYS from ${LOGIN_DEFS}"
@@ -61,8 +34,6 @@
         fi
     fi
 
-    # Test        : CUST-1030
-    # Description : Password warning age should be configured
     Register --test-no CUST-1030 --preqs-met ${PREQS_MET} --skip-reason "${SKIPREASON}" --weight L --network NO --category security --description "Checking password warning age (PASS_WARN_AGE)"
     if [ ${SKIPTEST} -eq 0 ]; then
         LogText "Test: reading PASS_WARN_AGE from ${LOGIN_DEFS}"
@@ -77,8 +48,6 @@
         fi
     fi
 
-    # Test        : CUST-1040
-    # Description : Password complexity module (pam_pwquality) should be enabled
     if [ -f "${PAM_COMMON}" ]; then PAM_PREQS="YES"; PAM_SKIP=""; else PAM_PREQS="NO"; PAM_SKIP="common-password not found (Debian and Ubuntu only)"; fi
     Register --test-no CUST-1040 --preqs-met ${PAM_PREQS} --skip-reason "${PAM_SKIP}" --weight L --network NO --category security --description "Checking password complexity module (pam_pwquality)"
     if [ ${SKIPTEST} -eq 0 ]; then
@@ -93,15 +62,9 @@
         fi
     fi
 
-    # Pause here when not running with --quick (handy for taking a screenshot)
     WaitForKeyPress
 
 
-#################################################################################
-#
-# ENHANCEMENT OPTION 2: SSH SECURITY CONFIGURATION AUDIT
-#
-#################################################################################
 
     InsertSection "Custom tests - SSH security configuration audit"
 
@@ -125,8 +88,6 @@
         fi
     fi
 
-    # Test        : CUST-2020
-    # Description : Password authentication over SSH (information only)
     Register --test-no CUST-2020 --preqs-met ${SSH_PREQS} --skip-reason "${SSH_SKIP}" --weight L --network NO --category security --description "Checking SSH password authentication (PasswordAuthentication)"
     if [ ${SKIPTEST} -eq 0 ]; then
         LogText "Test: reading PasswordAuthentication from ${SSH_CONFIG}"
@@ -140,8 +101,6 @@
         fi
     fi
 
-    # Test        : CUST-2030
-    # Description : Empty passwords must not be allowed over SSH
     Register --test-no CUST-2030 --preqs-met ${SSH_PREQS} --skip-reason "${SSH_SKIP}" --weight M --network NO --category security --description "Checking SSH empty passwords (PermitEmptyPasswords)"
     if [ ${SKIPTEST} -eq 0 ]; then
         LogText "Test: reading PermitEmptyPasswords from ${SSH_CONFIG}"
@@ -156,8 +115,6 @@
         fi
     fi
 
-    # Test        : CUST-2040
-    # Description : Maximum authentication attempts per connection
     Register --test-no CUST-2040 --preqs-met ${SSH_PREQS} --skip-reason "${SSH_SKIP}" --weight L --network NO --category security --description "Checking SSH maximum authentication attempts (MaxAuthTries)"
     if [ ${SKIPTEST} -eq 0 ]; then
         LogText "Test: reading MaxAuthTries from ${SSH_CONFIG}"
@@ -171,8 +128,6 @@
         fi
     fi
 
-    # Test        : CUST-2050
-    # Description : Login grace time
     Register --test-no CUST-2050 --preqs-met ${SSH_PREQS} --skip-reason "${SSH_SKIP}" --weight L --network NO --category security --description "Checking SSH login grace time (LoginGraceTime)"
     if [ ${SKIPTEST} -eq 0 ]; then
         LogText "Test: reading LoginGraceTime from ${SSH_CONFIG}"
@@ -186,7 +141,6 @@
         fi
     fi
 
-# Wait for keypress (unless --quick is being used)
 WaitForKeyPress
 
 #
